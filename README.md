@@ -1,1 +1,1 @@
-This is source code for GC-reweighting
+This repository contains modifications to LAMMPS to implement constant-electrochemical-potential Langevin dynamics and trajectory reweighting, together with the same version of DeePMD-kit used for TP-classical MD.
