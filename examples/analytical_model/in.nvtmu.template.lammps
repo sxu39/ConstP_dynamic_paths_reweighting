@@ -1,0 +1,47 @@
+variable        NSTEPS          equal 50000
+variable        THERMO_FREQ     equal 10
+variable        REWEIGHT_FREQ   equal 1
+variable        DUMP_FREQ       equal 100
+variable        TEMP            equal 5
+variable        TAU_T           equal 30.0
+variable        TAU_NE          equal 1.0
+variable        MU              equal -20.0
+variable        MASS_NE         equal 100.0
+
+units           lj
+boundary        f p p
+atom_style      atomic
+atom_modify     map array
+
+neighbor        0.0 bin
+neigh_modify    every 1 delay 0 check no
+
+read_data_new   cases/${CASEID}/lmp.stru
+
+mass            1 1.0
+
+fix             pot all toy 1 8 64 50 0.03
+fix             constnvtmu all nvtmu ${TEMP} ${TAU_T} ${TAU_NE} ${SEED_NVT} ${MU} mass_Ne ${MASS_NE}
+fix             rew all reweight constnvtmu 0.0
+
+thermo          ${THERMO_FREQ}
+thermo_style    custom step pe Ne dE_dN f_rew[0]
+thermo_modify   format float %.15g
+
+variable        pe_      equal pe
+variable        Ne_      equal Ne
+variable        x_       equal x[1]
+variable        vx_      equal vx[1]
+variable        dEdN     equal dE_dN
+
+print "Step Pe Ne x vx dE_dN" file thermo.out screen no
+fix             f_thermo_out all ave/time ${THERMO_FREQ} 1 ${THERMO_FREQ} v_pe_ v_Ne_ v_x_ v_vx_ v_dEdN file cases/${CASEID}/thermo.out mode scalar ave one
+fix             f_reweight_out all ave/time ${REWEIGHT_FREQ} 1 ${REWEIGHT_FREQ} f_rew[0] file cases/${CASEID}/reweight.out mode scalar ave one
+
+dump            1 all custom ${DUMP_FREQ} cases/${CASEID}/dump/*.dump id type x y z vx vy vz
+
+timestep        0.001
+
+run             ${NSTEPS} upto
+
+write_data_new  cases/${CASEID}/final.data

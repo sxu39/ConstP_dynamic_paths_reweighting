@@ -1,0 +1,6 @@
+# LAMMPS build outputs
+lammps-constP-langevin-reweighting/src/Obj_mpi/
+lammps-constP-langevin-reweighting/src/Obj_serial/
+lammps-constP-langevin-reweighting/src/*.a
+lammps-constP-langevin-reweighting/src/lmp_mpi
+lammps-constP-langevin-reweighting/src/lmp_serial
